@@ -117,8 +117,8 @@ contract DSCEngine is ReentrancyGuard {
     function mintDSC(uint256 amountDscToMint) external moreThanZero(amountDscToMint) nonReentrant {
         s_DSCMinted[msg.sender] += amountDscToMint;
         _revertIfHealthFactorIsBroken(msg.sender);
-        bool minted = i_dsc.mint(msg.sender,amountDscToMint);
-        if(!minted){
+        bool minted = i_dsc.mint(msg.sender, amountDscToMint);
+        if (!minted) {
             revert DSCEngine__MintFailed();
         }
     }
