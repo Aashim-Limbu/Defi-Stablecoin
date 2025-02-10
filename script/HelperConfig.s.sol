@@ -14,6 +14,8 @@ contract HelperConfig is Script {
         uint256 deployerKey;
     }
 
+    uint256 public immutable DEFAULT_ANVIL_PRIVATE_KEY =
+        0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     uint8 public constant DECIMALS = 8;
     int256 public constant ETH_USD_PRICE = 3000e8; // 3000e8
     int256 public constant BTC_USD_PRICE = 100000e8; // 1 lakh ^8
@@ -52,7 +54,7 @@ contract HelperConfig is Script {
             wbtcUsdPriceFeed: address(btcUsdPriceFeed),
             weth: address(wethMock),
             wbtc: address(wbtcMock),
-            deployerKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 //Default Anvil PrivateKey
+            deployerKey: DEFAULT_ANVIL_PRIVATE_KEY
         });
     }
 }

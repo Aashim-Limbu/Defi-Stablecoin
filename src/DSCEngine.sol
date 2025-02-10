@@ -184,6 +184,6 @@ contract DSCEngine is ReentrancyGuard {
     function getUsdValue(address token, uint256 amount) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
         (, int256 price,,,) = priceFeed.latestRoundData(); // this is rounded to 1e8 to make it to wei 1e18 we multiply it with 1e10 just to make it 1e18
-        return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / 1e18; //1e18 * 1e*18 so divide by 1e18
+        return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / 1e18; //1e18 * 1e*18 so divide by 1e18 , since amount is also in terms of 1e18
     }
 }
