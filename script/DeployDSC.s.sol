@@ -17,6 +17,7 @@ contract DeployDSC is Script {
         tokenAddresses = [weth, wbtc];
         priceFeedAddresses = [wethUsdPriceFeed, wbtcUsdPriceFeed];
         vm.startBroadcast(deployerKey);
+        //By default the test contract will be the deployer Address so, using private-key for account address
         address deployerAddress = vm.addr(deployerKey);
         DecentralizedStableCoin dsc = new DecentralizedStableCoin(deployerAddress);
         DSCEngine dscEngine = new DSCEngine(tokenAddresses, priceFeedAddresses, address(dsc));
