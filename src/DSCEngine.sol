@@ -182,8 +182,8 @@ contract DSCEngine is ReentrancyGuard {
         moreThanZero(debtToCover)
         nonReentrant
     {
-        uint256 victimUserHealthFactor = _healthFactor(victim);
-        if (victimUserHealthFactor >= MIN_HEALTH_FACTOR) {
+        uint256 startingHealthFactor = _healthFactor(victim);
+        if (startingHealthFactor >= MIN_HEALTH_FACTOR) {
             revert DSCEngine__healthFactorGood();
         }
         uint256 totalCollateralAmountToBeCoveredForDebt = getTokenAmountFromUSD(collateralAddress, debtToCover);
@@ -196,7 +196,9 @@ contract DSCEngine is ReentrancyGuard {
         _redeemCollateral(collateralAddress, totalCollateralRedeem, victim, msg.sender);
         _burnDSC(debtToCover, victim, msg.sender);
         uint256 endingUserHealthFactor = _healthFactor(victim);
-        if (endingUserHealthFactor <= victimUserHealthFactor) {
+        console.log("Starting Health Factor: ", startingHealthFactor);
+        console.log("Ending Health Factor: ", endingUserHealthFactor);
+        if (endingUserHealthFactor <= startingHealthFactor) {
             // we actually don't imporve the health factor of victim hence, reverting ==> the debtToCover is not enough to improve the health factor.
             revert DSCEngine__HealthFactorNotImproved();
         }
@@ -231,6 +233,7 @@ contract DSCEngine is ReentrancyGuard {
      *
      * @dev Do not call this internal function unless the function that invoke this particular function has already checked the health factor.
      */
+    //10 ether , vicitm , liquidator
     function _burnDSC(uint256 amountToBurn, address onBehalfOf, address dscFrom) internal {
         s_DSCMinted[onBehalfOf] -= amountToBurn;
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountToBurn);
@@ -242,7 +245,7 @@ contract DSCEngine is ReentrancyGuard {
 
     function _healthFactor(address user) private view returns (uint256) {
         (uint256 totalDscMinted, uint256 totalCollateralValueInUsd) = _getAccountInformation(user);
-        if(totalDscMinted == 0 ){
+        if (totalDscMinted == 0) {
             return type(uint256).max;
         }
         uint256 collateralAdjustedForThresold =
@@ -317,7 +320,19 @@ contract DSCEngine is ReentrancyGuard {
         return s_collateralDeposited[user][collateralType];
     }
 
+    function getHealthFactor(address user) public view returns (uint256) {
+        return _healthFactor(user);
+    }
+
     function getAccountInformation() external view returns (uint256 totalDSCMinted, uint256 collateralValueInUSD) {
         return _getAccountInformation(msg.sender);
+    }
+
+    function getLiquidationPrecision() public pure returns (uint256) {
+        return LIQUIDATION_PRECISION;
+    }
+
+    function getLiquidationBonus() public pure returns (uint256) {
+        return LIQUIDATION_BONUS;
     }
 }
