@@ -138,6 +138,7 @@ contract DSCEngine is ReentrancyGuard {
      */
     function mintDSC(uint256 amountDscToMint) public moreThanZero(amountDscToMint) nonReentrant {
         s_DSCMinted[msg.sender] += amountDscToMint;
+        console.log("s_DSCMinted[msg.sender]", s_DSCMinted[msg.sender]);
         _revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
         if (!minted) {
@@ -245,13 +246,14 @@ contract DSCEngine is ReentrancyGuard {
 
     function _healthFactor(address user) private view returns (uint256) {
         (uint256 totalDscMinted, uint256 totalCollateralValueInUsd) = _getAccountInformation(user);
-        if (totalDscMinted == 0) {
-            return type(uint256).max;
-        }
-        uint256 collateralAdjustedForThresold =
-            (totalCollateralValueInUsd * LIQUIDATION_THRESOLD) / LIQUIDATION_PRECISION;
-        //essentially reducing the collateral by 50% so that it always have higher collateral than the minted one.
-        return (collateralAdjustedForThresold * PRECISION) / totalDscMinted;
+        // if (totalDscMinted == 0) {
+        //     return type(uint256).max; // infinite health factor for minted DSC number 0. the health factor becomes problem if it is less than 1.
+        // }
+        // uint256 collateralAdjustedForThresold =
+        //     (totalCollateralValueInUsd * LIQUIDATION_THRESOLD) / LIQUIDATION_PRECISION;
+        // //essentially reducing the collateral by 50% so that it always have higher collateral than the minted one.
+        // return (collateralAdjustedForThresold * PRECISION) / totalDscMinted;
+        return _calculateHealthFactor(totalDscMinted, totalCollateralValueInUsd);
     }
 
     // from:victim to:liquidator
@@ -274,8 +276,10 @@ contract DSCEngine is ReentrancyGuard {
         pure
         returns (uint256 healthFactor)
     {
-        healthFactor = (amountCollateralDepositedInUSD * LIQUIDATION_THRESOLD * PRECISION)
-            / (amountDSCMinted * LIQUIDATION_PRECISION);
+        if (amountDSCMinted == 0) return type(uint256).max;
+        uint256 collateralAdjustedForThresold =
+            amountCollateralDepositedInUSD * LIQUIDATION_THRESOLD / LIQUIDATION_PRECISION;
+        healthFactor = (collateralAdjustedForThresold * PRECISION) / (amountDSCMinted);
     }
 
     function _getAccountInformation(address user)
@@ -332,7 +336,19 @@ contract DSCEngine is ReentrancyGuard {
         return LIQUIDATION_PRECISION;
     }
 
+    function getDsc() external view returns (address) {
+        return address(i_dsc);
+    }
+
     function getLiquidationBonus() public pure returns (uint256) {
         return LIQUIDATION_BONUS;
+    }
+
+    function getCollateralTokens() external view returns (address[] memory) {
+        return s_collateralTokenAddresses;
+    }
+
+    function getUserCollateralBalance(address collateral, address user) external view returns (uint256) {
+        return s_collateralDeposited[collateral][user];
     }
 }
