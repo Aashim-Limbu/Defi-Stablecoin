@@ -33,6 +33,6 @@ contract OpenInvariantTest is StdInvariant, Test {
         uint256 wethUSDValue = dscEngine.getTokenUsdValue(weth, totalWethDeposited);
         uint256 wbtcUSDValue = dscEngine.getTokenUsdValue(wbtc, totalWbtcDeposited);
 
-        assert(wethUSDValue + wbtcUSDValue > totalDSCSupply);
+        assert(wethUSDValue + wbtcUSDValue >= totalDSCSupply);
     }
 }

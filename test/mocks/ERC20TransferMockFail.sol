@@ -12,16 +12,23 @@ contract ERC20TransferMockFails is ERC20Burnable, Ownable {
 
     constructor(address owner) ERC20("DecentralizedStableCoin", "DSC") Ownable(owner) {}
 
-    function burn(uint256 _amount) public override onlyOwner{
+    function burn(uint256 _amount) public override onlyOwner {
         uint256 balance = balanceOf(msg.sender);
-        if(balance == 0) revert DecentralizedStableCoin__AmountMustBeMoreThanZero();
-        if(balance < _amount) revert DecentralizedStableCoin__BurnAmountExceedsBalance();
+        if (balance == 0) revert DecentralizedStableCoin__AmountMustBeMoreThanZero();
+        if (balance < _amount) revert DecentralizedStableCoin__BurnAmountExceedsBalance();
         super.burn(_amount);
     }
-    function mint(address account,uint256 amountToMint) public onlyOwner{
-        _mint(account,amountToMint);
+
+    function mint(address account, uint256 amountToMint) public onlyOwner {
+        _mint(account, amountToMint);
     }
-    function transfer(address /*recipent address*/,uint256 /*amount to Transfer*/) public override pure returns(bool) {
+
+    function transfer(address, /*recipent address*/ uint256 /*amount to Transfer*/ )
+        public
+        pure
+        override
+        returns (bool)
+    {
         return false;
     }
 }

@@ -1,7 +1,7 @@
     // SPDX-License-Identifier: MIT
 pragma solidity >= 0.8.0 <0.9.0;
 
-import {Test,console} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {DeployDSC} from "script/DeployDSC.s.sol";
 import {DSCEngine} from "src/DSCEngine.sol";
@@ -37,7 +37,7 @@ contract OpenInvariantTest is StdInvariant, Test {
         uint256 wethUSDValue = dscEngine.getTokenUsdValue(weth, totalWethDeposited);
         uint256 wbtcUSDValue = dscEngine.getTokenUsdValue(wbtc, totalWbtcDeposited);
 
-        console.log("Times Minted",handler.timesMintIsCalled());
+        console.log("Times Minted", handler.timesMintIsCalled());
 
         assert(wethUSDValue + wbtcUSDValue >= totalDSCSupply);
     }
